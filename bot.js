@@ -57,7 +57,7 @@ client.on("messageCreate", msg => {
             const flowerEmbed = new MessageEmbed()
             .setColor('#2F3136')
             .setTitle('Flower #' + number)
-            .setURL('https://opensea.io/assets/0x5a876ffc6e75066f5ca870e20fca4754c1efe91f/' + number)
+            .setURL('https://ipfs.io/ipfs/' + res.image.png)
             .addFields(
                 { name: 'Petal style', value: res.attributes.petalStyle, inline: true },
                 { name: 'Spinny', value: res.attributes.spin ? ("Yes [(gif)](" + gifuri +")") : "No", inline: true },
