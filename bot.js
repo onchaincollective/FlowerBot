@@ -1,101 +1,82 @@
-const { Client, Intents, Constants, MessageEmbed, MessageAttachment } = require('discord.js');
-const dotenv = require('dotenv');
-const fs = require("fs");
-const logouri = 'https://lh3.googleusercontent.com/QXaAXCfdQthkf5ykh1t5-SVb8uKS9vjMKoQ-GRS714JX6LVoIhq5RufyP-IAv1rKBIoTHrnmUtn2W8Pc_1KlHOIIATXzO6_7C5kDng=s0';
+import { getFlower } from "occ-flowers-sdk";
+import { Client, Intents, MessageEmbed } from 'discord.js';
+import dotenv from 'dotenv';
 
 dotenv.config();
-
-
-const generateEmbed = (imageuri, uri, interaction, assetNumber) => {
-    return new MessageEmbed()
-    .setColor('#0099ff')
-    .setTitle(`Flower #${assetNumber}`)
-    .setURL(uri)
-    .setAuthor('On Chain Collection', logouri, 'https://occ.xyz')
-    .setDescription(`<@!${interaction.member.id}>`)
-    .setThumbnail(logouri)
-    // .addFields(...attributes.map(x => { return {name: x['trait_type'], value:x['value'], inline:true}}))
-    .setImage(imageuri)
-    .setTimestamp()
-    .setFooter('OCC Flower Bot', logouri);
-};
-
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
 
 client.on('ready', () => {
-    
     console.log('Ready!');
-    const guild = client.guilds.cache.get(process.env.GUILD_ID);
-    let commands;
-    if (guild) {
-        commands = guild.commands;
-    } else {
-        commands = client.application?.commands
-    }
-    
-    commands?.create({
-        name: 'flower',
-        description: 'Show the flower Image',
-        options: [
-            {
-                name: 'flowernumber',
-                description: 'Flower Number',
-                required: true,
-                type: Constants.ApplicationCommandOptionTypes.INTEGER
-            }
-        ]
-    })
-    
 });
 
+// {
+//     tokenId: 212,
+//     attributes: {
+//       petalStyle: 'Lotus',
+//       petalColor: 'White',
+//       coreSize: 25,
+//       noOfPetals: 11,
+//       bgColor: 'Light Aprico',
+//       bgOverlay: 'Canary Yellow',
+//       mutation: 'None',
+//       spin: false,
+//       bgType: 'Normal'
+//     },
+//     image: {
+//       svg: 'QmZBMHASJbTXRgJeTNP8Sjz5gBcs5iibUa9GQjgwwt8xfq',
+//       gif: null,
+//       png: 'QmUx2K1RFttB258TeEQmwBqn8b3cNCgJffwT23bB5PnauR'
+//     },
+//     rarity: {
+//       occurrence: { rank: 2951, score: 10607 },
+//       probability: { rank: 2972, score: 19.821303355416607 },
+//       rarityTools: { rank: 2807, score: 164.42204639094797 }
+//     }
+//   }
 
-client.on('interactionCreate', async (interaction) => {
-    if (!interaction.isCommand()) {
-        return
-    }
-    const { commandName, options } = interaction
-    
-    if (commandName === "flower") {
-        let imageuri;
-        const assetNumber = options.getInteger('flowernumber');
-        if (assetNumber && assetNumber > 0 && assetNumber < 4097) {
-            let imageobj = JSON.parse(fs.readFileSync('images.json', 'utf-8'));
-            if (imageobj['' + assetNumber]['gif'] !== null) {
-                imageuri = 'https://ipfs.io/ipfs/' + imageobj['' + assetNumber]['gif'];
-            } else {
-                imageuri = 'https://ipfs.io/ipfs/' + imageobj['' + assetNumber]['png'];
-            }
-            
-            
-            const flowerEmbed = generateEmbed(imageuri, imageuri, interaction, assetNumber);
-            try {
-                interaction.channel.send({
-                    embeds: [flowerEmbed]
-                }) && 
-                interaction.reply({
-                    content: `ok`,
-                    hidden: true
-                }) &&
-                interaction.deleteReply();
-            } catch(e) {
-                interaction.reply({
-                    content: `The Bot is Busy, Please try again in some time :)`,
-                    ephemeral: false
-                });
-                console.error(e);
-            }
-            
-        } else {
-            interaction.reply({
-                content: `You Passed ${options.getInteger('flowernumber')}, The flower numbers are from 1 to 4096`,
-                ephemeral: false
-            });
+client.on("messageCreate", msg => {
+
+    if (msg.content.startsWith('!flower')) {
+        const number = msg.content.split(" ")[1];
+        if (parseInt(number) > 4096) {
+            msg.reply('👀 I thought there were only 4096 flowerinos');
+            return;
+        } else if (parseInt(number) < 1 || isNaN(number)) {
+            msg.reply("Why don't you try with a legit number 🌼");
+            return;
         }
+
+        getFlower(parseInt(number)).then((res) => {
+            console.log(res);
+            let imageuri, gifuri;
+            imageuri = 'https://ipfs.io/ipfs/' + res.image.png;
+            if (res.image.gif) {
+                gifuri = 'https://ipfs.io/ipfs/' + res.image.gif;
+            }
+            const flowerEmbed = new MessageEmbed()
+            .setColor('#2F3136')
+            .setTitle('Flower #' + number)
+            .setURL('https://opensea.io/assets/0x5a876ffc6e75066f5ca870e20fca4754c1efe91f/' + number)
+            .addFields(
+                { name: 'Petal style', value: res.attributes.petalStyle, inline: true },
+                { name: 'Spinny', value: res.attributes.spin ? ("Yes [(gif)](" + gifuri +")") : "No", inline: true },
+                { name: 'Mutation', value: res.attributes.mutation, inline: true },
+                { name: 'Bg type', value: res.attributes.bgType, inline: true },
+                { name: 'Petal count', value: res.attributes.noOfPetals.toString(), inline: true },
+                { name: 'Rarity', value: "Rank: " + res.rarity.rarityTools.rank, inline: true },
+            )
+            .setImage(imageuri)
+            .setTimestamp()
+            .setFooter('🌸👄🌸');
+            msg.reply({ embeds: [flowerEmbed] });
+        }).catch(error => {
+            console.log(error);
+            msg.reply("Oops! Something went wrong");
+        });
     }
-    
-});
+  })
 
 // Login to Discord with your client's token
 client.login(process.env.TOKEN);
