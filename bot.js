@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
-
+const cloudinaryUri = "https://res.cloudinary.com/ds24tivvl/image/upload/v1633769537/flowers/"
 
 client.on('ready', () => {
     console.log('Ready!');
