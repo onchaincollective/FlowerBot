@@ -38,7 +38,7 @@ client.on('ready', () => {
 
 client.on("messageCreate", msg => {
 
-    if (msg.content.startsWith('!flower')) {
+    if (msg.content.startsWith('!gib')) {
         const number = msg.content.split(" ")[1];
         if (parseInt(number) > 4096) {
             msg.reply('👀 I thought there were only 4096 flowerinos');
@@ -49,7 +49,6 @@ client.on("messageCreate", msg => {
         }
 
         getFlower(parseInt(number)).then((res) => {
-            console.log(res);
             let imageuri, gifuri;
             imageuri = 'https://ipfs.io/ipfs/' + res.image.png;
             if (res.image.gif) {
@@ -69,7 +68,6 @@ client.on("messageCreate", msg => {
             )
             .setImage(imageuri)
             .setTimestamp()
-            .setFooter('🌸👄🌸');
             msg.reply({ embeds: [flowerEmbed] });
         }).catch(error => {
             console.log(error);
