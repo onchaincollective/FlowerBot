@@ -52,7 +52,7 @@ client.on("messageCreate", msg => {
             let imageuri, gifuri;
             imageuri = 'https://ipfs.io/ipfs/' + res.image.png;
             if (res.image.gif) {
-                gifuri = 'https://ipfs.io/ipfs/' + res.image.gif;
+                gifuri = cloudinaryUri + number + ".gif";
             }
             const flowerEmbed = new MessageEmbed()
             .setColor('#2F3136')
@@ -66,7 +66,7 @@ client.on("messageCreate", msg => {
                 { name: 'Petal count', value: res.attributes.noOfPetals.toString(), inline: true },
                 { name: 'Rarity', value: "Rank: " + res.rarity.rarityTools.rank, inline: true },
             )
-            .setImage(imageuri)
+            .setImage(gifuri ? gifuri : imageuri)
             .setTimestamp()
             msg.reply({ embeds: [flowerEmbed] });
         }).catch(error => {
