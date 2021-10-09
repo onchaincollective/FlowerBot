@@ -51,14 +51,14 @@ client.on("messageCreate", msg => {
 
         getFlower(parseInt(number)).then((res) => {
             let imageuri, gifuri;
-            imageuri = cloudinaryUri + number + ".png";
+            imageuri = cloudinaryPngUri + number + ".png";
             if (res.attributes.spin) {
-                gifuri = cloudinaryUri + number + ".gif";
+                gifuri = cloudinaryGifUri + number + ".gif";
             }
             const flowerEmbed = new MessageEmbed()
             .setColor('#2F3136')
             .setTitle('Flower #' + number)
-            .setURL('https://ipfs.io/ipfs/' + res.image.png)
+            .setURL('https://opensea.io/assets/0x5a876ffc6e75066f5ca870e20fca4754c1efe91f/' + number)
             .addFields(
                 { name: 'Petal style', value: res.attributes.petalStyle, inline: true },
                 { name: 'Spinny', value: res.attributes.spin ? "Yes" : "No", inline: true },
