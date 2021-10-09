@@ -5,7 +5,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
-const cloudinaryUri = "https://res.cloudinary.com/ds24tivvl/image/upload/flowers/"
+const cloudinaryGifUri = "https://res.cloudinary.com/ds24tivvl/image/upload/flowers/";
+const cloudinaryPngUri = "https://res.cloudinary.com/ds24tivvl/image/upload/flowers-pngs/";
 
 client.on('ready', () => {
     console.log('Ready!');
@@ -50,8 +51,8 @@ client.on("messageCreate", msg => {
 
         getFlower(parseInt(number)).then((res) => {
             let imageuri, gifuri;
-            imageuri = 'https://ipfs.io/ipfs/' + res.image.png;
-            if (res.image.gif) {
+            imageuri = cloudinaryUri + number + ".png";
+            if (res.attributes.spin) {
                 gifuri = cloudinaryUri + number + ".gif";
             }
             const flowerEmbed = new MessageEmbed()
@@ -60,7 +61,7 @@ client.on("messageCreate", msg => {
             .setURL('https://ipfs.io/ipfs/' + res.image.png)
             .addFields(
                 { name: 'Petal style', value: res.attributes.petalStyle, inline: true },
-                { name: 'Spinny', value: res.attributes.spin ? ("Yes [(gif)](" + gifuri +")") : "No", inline: true },
+                { name: 'Spinny', value: res.attributes.spin ? "Yes" : "No", inline: true },
                 { name: 'Mutation', value: res.attributes.mutation, inline: true },
                 { name: 'Bg type', value: res.attributes.bgType, inline: true },
                 { name: 'Petal count', value: res.attributes.noOfPetals.toString(), inline: true },
