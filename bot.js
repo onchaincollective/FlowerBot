@@ -5,8 +5,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
-const cloudinaryGifUri = "https://res.cloudinary.com/ds24tivvl/image/upload/flowers/";
-const cloudinaryPngUri = "https://res.cloudinary.com/ds24tivvl/image/upload/flowers-pngs/";
+const cloudinaryGifUri = "https://occ.mypinata.cloud/ipfs/QmX6588MExWWuRACxLpuPZwHy7CHxgTrCqsHK8qpdtajkT/gifs/";
+const cloudinaryPngUri = "https://occ.mypinata.cloud/ipfs/QmX6588MExWWuRACxLpuPZwHy7CHxgTrCqsHK8qpdtajkT/pngs/";
 
 client.on('ready', () => {
     console.log('Ready!');
